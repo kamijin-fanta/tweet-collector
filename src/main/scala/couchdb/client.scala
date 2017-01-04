@@ -129,6 +129,7 @@ case class CouchdbDatabaseSync(client: CouchdbClientSync, databaseName: String) 
                 case conflict @ Left(Conflict(_, _)) =>
                   if (conflictRetry > 0) updateDocument(conflictRetry - 1)
                   else conflict
+                case x => x
               }
             case None => Left(AbortProcess())
           }

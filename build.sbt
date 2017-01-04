@@ -7,10 +7,11 @@ scalaVersion := "2.11.8"
 resolvers += Resolver.sonatypeRepo("releases")
 
 libraryDependencies ++= {
-  val akkaVersion = "2.3.6"
+  val akkaVersion = "2.4.11"
   Seq(
     "com.typesafe.akka" %% "akka-actor" % akkaVersion,
-    "com.danielasfregola" %% "twitter4s" % "3.0",
+    "com.danielasfregola" %% "twitter4s" % "3.1-SNAPSHOT",
+//    "com.danielasfregola" %% "twitter4s" % "3.0",
     "org.http4s" %% "http4s-core" % "0.15.2",
     "org.http4s" %% "http4s-blaze-client" % "0.15.2",
     "org.scalaj" %% "scalaj-http" % "2.3.0",
