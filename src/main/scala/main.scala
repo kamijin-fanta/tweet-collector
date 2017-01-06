@@ -7,16 +7,14 @@ object main {
     implicit val system = ActorSystem()
     println("Start")
 
-//    system.actorOf(Props[TwitterStreamCollectActor])
-
     val childProps = Props(classOf[TwitterStreamCollectActor])
 
     val supervisor = BackoffSupervisor.props(
       Backoff.onStop(
         childProps,
         childName = "twitter-stream",
-        minBackoff = 1.seconds,
-        maxBackoff = 5.seconds,
+        minBackoff = 10.seconds,
+        maxBackoff = 30.seconds,
         randomFactor = 0.2
       ))
 
