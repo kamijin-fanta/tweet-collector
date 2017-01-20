@@ -10,7 +10,7 @@ libraryDependencies ++= {
   val akkaVersion = "2.4.16"
   Seq(
     "com.typesafe.akka" %% "akka-actor" % akkaVersion,
-    "com.danielasfregola" %% "twitter4s" % "4.0",
+    "com.danielasfregola" %% "twitter4s" % "4.1",
 //    "com.danielasfregola" %% "twitter4s" % "3.0",
     "org.http4s" %% "http4s-core" % "0.15.2",
     "org.http4s" %% "http4s-blaze-client" % "0.15.2",

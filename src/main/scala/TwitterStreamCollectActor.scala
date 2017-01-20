@@ -1,7 +1,10 @@
 import akka.actor.{Actor, ActorRef, Props}
+import akka.http.scaladsl.model.StatusCode
 import akka.routing.RoundRobinPool
 import com.danielasfregola.twitter4s.entities.enums.Language
 import com.danielasfregola.twitter4s.entities.{AccessToken, ConsumerToken}
+import com.danielasfregola.twitter4s.exceptions.TwitterException
+import com.danielasfregola.twitter4s.http.clients.streaming.TwitterStream
 import com.danielasfregola.twitter4s.util.Configurations
 import com.danielasfregola.twitter4s.{TwitterRestClient, TwitterStreamingClient}
 import couchdb.CouchdbClientSync
@@ -30,21 +33,29 @@ class TwitterStreamCollectActor extends Actor {
     val publicStreamDb = couchdbClient.db("public-tweet-1")
 
     val userStreamRoundRobin = RoundRobinPool(5).props(Props(new UserStreamActor(userStreamDb)))
-    userStreamActor = context.actorOf(userStreamRoundRobin)
-    publicStreamActor = context.actorOf(Props(new PublicStreamActor(publicStreamDb)))
+    userStreamActor = context.actorOf(userStreamRoundRobin, "userStreamRoundRobin")
+    publicStreamActor = context.actorOf(Props(new PublicStreamActor(publicStreamDb)), "PublicStreamActor")
 
-    val restart: PartialFunction[Try[Unit], Unit] = {
-      case Success(_) =>
-        if (!terminateFlag) {
-          terminateFlag = true
-          context.stop(self)
+    val restart = (t: Try[TwitterStream]) => {
+      println("STOP!!!!!!!!!!!!!")
+      println(t)
+
+      t match {
+        case Success(twitterStream) => {
+
         }
-      case Failure(ex) =>
-        println(s"Failure $ex")
-        if (!terminateFlag) {
-          terminateFlag = true
-          context.stop(self)
+        case Failure(exception) => exception match {
+          case ex: TwitterException if ex.code == StatusCode.int2StatusCode(420) => {
+            println("too many request")
+            Thread.sleep(1000 * 20)
+          }
         }
+      }
+
+      if (!terminateFlag) {
+        terminateFlag = true
+        context.stop(self)
+      }
     }
     streamingClient.userEvents(replies = Some(true)) {
       case message => userStreamActor ! message
