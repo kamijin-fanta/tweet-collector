@@ -37,24 +37,23 @@ class TwitterStreamCollectActor extends Actor {
     publicStreamActor = context.actorOf(Props(new PublicStreamActor(publicStreamDb)), "PublicStreamActor")
 
     val restart = (t: Try[TwitterStream]) => {
-      println("STOP!!!!!!!!!!!!!")
+      println("Complete!!!!!!!!!!!!!")
       println(t)
 
       t match {
         case Success(twitterStream) => {
-
         }
         case Failure(exception) => exception match {
           case ex: TwitterException if ex.code == StatusCode.int2StatusCode(420) => {
             println("too many request")
             Thread.sleep(1000 * 20)
+
+            if (!terminateFlag) {
+              terminateFlag = true
+              context.stop(self)
+            }
           }
         }
-      }
-
-      if (!terminateFlag) {
-        terminateFlag = true
-        context.stop(self)
       }
     }
     streamingClient.userEvents(replies = Some(true)) {
